@@ -79,13 +79,16 @@ footer .note{opacity:.7;margin-top:18px;font-size:13px}
   .hero .grid,.testers{grid-template-columns:minmax(0,1fr)}
   .phones{height:470px}
   .steps,.feats{grid-template-columns:minmax(0,1fr)}
-  .step .shot{height:260px}
+  /* On phones the cards stack, so show each app screen whole rather than a cropped peek */
+  .step{padding-bottom:22px}
+  .step .shot{height:auto;width:min(100%,280px);margin:4px auto 0;border-radius:30px;border-bottom:8px solid #1C1B1A}
+  .step .shot img{border-radius:22px}
 }
 @media(max-width:600px){
   .price{grid-template-columns:minmax(0,1fr)}
   nav.top .links a.hide-s{display:none}
   .phone{width:180px}.phone.a{left:2%}.phone.b{right:2%;top:70px}
-  .phones{height:420px}
+  .phones{height:500px}
 }
 @media(prefers-reduced-motion:no-preference){
   .phone.b{animation:bob 5s ease-in-out infinite}
