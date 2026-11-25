@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Not found · Not Fussed</title>
+<meta name="robots" content="noindex">
+<script>
+  // Group invite links look like getnotfussed.com/g/K7QF3. GitHub Pages has no page at that address,
+  // so it lands here: send it on to the group page with the code.
+  (function () {
+    var m = location.pathname.match(/^\/g\/([A-Za-z0-9]{3,8})\/?$/);
+    if (m) location.replace('/g/?c=' + m[1].toUpperCase());
+  })();
+</script>
+<link rel="icon" href="/img/icon.png">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<main class="wrap band" style="text-align:center">
+  <h1 style="font-size:48px">Can't find that.</h1>
+  <p class="sub" style="margin:16px auto 28px">Not fussed? Neither are we. Let's get you home.</p>
+  <a class="btn red" href="/">Back to Not Fussed</a>
+</main>
+</body>
+</html>

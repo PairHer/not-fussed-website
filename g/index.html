@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Join the group · Not Fussed</title>
+<meta name="description" content="Your mates can't decide what to cook. Chuck in what's in your fridge, vote, and Not Fussed sorts it.">
+<meta name="robots" content="noindex">
+<meta property="og:title" content="You've been invited: what are we having?">
+<meta property="og:description" content="Chuck in what's in your fridge, vote on dishes, and Not Fussed sorts it. No app needed.">
+<meta property="og:image" content="https://getnotfussed.com/img/share.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/img/icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=Caveat:wght@700&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+/* Group Mode in the browser: same look as the app. Red, cream, ink; Bricolage + Caveat. */
+:root{--red:#C83E22;--yellow:#F2C14E;--soft:#FBEBC4;--bg:#F3F2EE;--card:#fff;--ink:#1C1B1A;--muted:#55524D;--green:#2E7D32;color-scheme:light}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.5 Inter,system-ui,-apple-system,"Segoe UI",sans-serif;min-height:100dvh}
+main{max-width:480px;margin:0 auto;padding:16px 20px calc(28px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:16px;min-height:100dvh}
+.logo{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:800;font-size:28px;text-decoration:none;color:var(--ink);letter-spacing:-.02em}
+.logo span{font-family:Caveat,cursive;color:var(--red);font-size:1.25em;display:inline-block;transform:rotate(-6deg);margin-left:3px}
+h1{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:800;font-size:38px;line-height:1.05;letter-spacing:-.02em;margin:0;text-wrap:balance}
+h2{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:800;font-size:19px;margin:0}
+p{margin:0}
+.sub{color:var(--muted);font-size:17px}
+.kicker{color:var(--red);font-weight:800;font-size:15px}
+.card{background:var(--card);border-radius:24px;padding:18px;display:flex;flex-direction:column;gap:12px}
+.btn{appearance:none;border:0;min-height:58px;border-radius:30px;font:800 19px Inter,system-ui,sans-serif;background:var(--red);color:#fff;padding:0 20px;cursor:pointer;width:100%}
+.btn.outline{background:transparent;color:var(--ink);border:2px solid var(--ink);font-weight:700;font-size:17px}
+.btn.dark{background:var(--ink);color:#fff;font-size:16px;min-height:50px}
+.btn:disabled{opacity:.5;cursor:default}
+.btn:focus-visible,input:focus-visible,.chip:focus-visible,.mood:focus-visible{outline:3px solid var(--yellow);outline-offset:2px}
+input[type=text]{width:100%;min-height:56px;border-radius:28px;border:3px solid var(--ink);background:#fff;padding:0 20px;font:17px Inter,system-ui,sans-serif;color:var(--ink)}
+input.small{min-height:50px;border-width:2px;font-size:16px}
+.row{display:flex;gap:8px;align-items:center}
+.plus{flex:none;width:50px;height:50px;border-radius:25px;border:0;background:var(--ink);color:#fff;font:800 26px Inter,sans-serif;cursor:pointer}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:0;min-height:36px;border-radius:18px;background:var(--soft);padding:0 12px;font:700 14px Inter,sans-serif;color:var(--ink);cursor:pointer}
+.mood{border:2px solid var(--ink);background:transparent;min-height:44px;border-radius:22px;padding:0 14px;font:700 15px Inter,sans-serif;color:var(--ink);cursor:pointer}
+.mood[aria-pressed=true]{background:var(--red);border-color:var(--red);color:#fff}
+.member{display:flex;justify-content:space-between;gap:10px}
+.member b{font-weight:800}
+.member span{color:var(--muted);font-size:14px;text-align:right}
+.hint{color:var(--muted);font-size:14px;text-align:center}
+.err{color:var(--red);font-weight:600;font-size:15px}
+.dish{position:relative;background:#fff;border:4px solid var(--ink);border-radius:28px;padding:22px;min-height:280px;display:flex;flex-direction:column;justify-content:center;gap:10px;touch-action:pan-y;user-select:none;transition:transform .18s}
+.dish h2{font-size:30px;line-height:1.1}
+.dish .blurb{font-size:18px}
+.dish .meta{color:var(--muted);font-size:15px}
+.stamp{position:absolute;top:18px;font-weight:900;font-size:24px;border:3px solid;border-radius:10px;padding:0 10px;opacity:0}
+.stamp.yes{right:18px;color:var(--green);transform:rotate(12deg)}
+.stamp.no{left:18px;color:var(--red);transform:rotate(-12deg)}
+.votes{display:flex;gap:12px}
+.votes .btn{flex:1}
+.small-print{font-size:13px;color:var(--muted);text-align:center}
+.small-print a{color:inherit}
+.center{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center}
+.pot{font-size:64px;animation:bob 1.2s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-10px) rotate(-6deg)}}
+@media (prefers-reduced-motion:reduce){.pot{animation:none}.dish{transition:none}}
+.cta{background:var(--red);color:#fff;border-radius:24px;padding:18px;display:flex;flex-direction:column;gap:8px}
+.cta a{color:#fff;font-weight:800}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<main>
+  <a class="logo" href="/">not<span>fussed.</span></a>
+  <div id="app" style="display:contents"><div class="center"><div class="pot" aria-hidden="true">🍲</div><p class="sub">Finding your group…</p></div></div>
+</main>
+
+<script>
+(() => {
+  // Group Mode for friends, in the browser. Talks to the same Supabase "decide" function as the app.
+  // These two are PUBLIC values (made to sit in apps and web pages).
+  const SUPABASE_URL = 'https://hgotsevrbebqefwjsgwe.supabase.co';
+  const KEY = 'sb_publishable_RCUicZEYvoryq5CRvPjncw_p8S9xWb7';
+  const POLL_MS = 2000;
+  const MOODS = [['comfort', '🧸 Comfort'], ['spicy', '🌶️ Spicy'], ['light', '🥗 Light'], ['cant-be-arsed', '🛋️ Can’t be arsed']];
+
+  // The code comes from /g/K7QF3 (via 404.html) or /g/?c=K7QF3
+  const params = new URLSearchParams(location.search);
+  const code = (params.get('c') || location.pathname.split('/g/')[1] || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+  const app = document.getElementById('app');
+  const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+  // Remember who I am in this group (so a refresh doesn't lose you). Storage can fail in some browsers.
+  const memory = {};
+  const store = {
+    get(k) { try { return localStorage.getItem(k); } catch { return memory[k] ?? null; } },
+    set(k, v) { try { localStorage.setItem(k, v); } catch { memory[k] = v; } },
+  };
+  let token = code ? store.get('nf-group-' + code) : null;
+  let state = null;
+  let busy = false;
+  let draft = { items: [], mood: null, dislikes: '', editing: false }; // what I'm typing before "I'm in"
+  let lastHtml = '';
+
+  async function call(op, body = {}) {
+    const res = await fetch(SUPABASE_URL + '/functions/v1/decide', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', apikey: KEY, Authorization: 'Bearer ' + KEY },
+      body: JSON.stringify({ action: 'group', op, code, token, ...body }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || "Couldn't reach the group. Check your signal.");
+    return data;
+  }
+
+  async function refresh() {
+    if (!token) return;
+    try {
+      state = await call('state');
+      render();
+    } catch (e) {
+      if (!state) show(errorView(e.message));
+    }
+  }
+
+  async function act(work) {
+    if (busy) return;
+    busy = true; render();
+    try { await work(); await refresh(); }
+    catch (e) { alert(e.message); }
+    finally { busy = false; render(); }
+  }
+
+  // Only redraw when something changed, so typing isn't interrupted.
+  function show(html) {
+    if (html === lastHtml) return;
+    const focused = document.activeElement?.id;
+    const value = focused ? document.activeElement.value : null;
+    app.innerHTML = html;
+    lastHtml = html;
+    if (focused) {
+      const el = document.getElementById(focused);
+      if (el) { el.focus(); if (value !== null && 'value' in el) el.value = value; }
+    }
+    wire();
+  }
+
+  const errorView = (msg) => `<div class="center"><div class="pot" aria-hidden="true">🔥</div><h1>Well, that's burnt.</h1><p class="sub">${esc(msg)}</p></div>`;
+
+  function render() {
+    if (!code) return show(errorView("That link's missing the group code. Ask for it again."));
+    if (!token) return show(joinView());
+    if (!state) return;
+    if (state.status === 'thinking') return show(`<p class="kicker">Group ${esc(state.code)}</p><div class="center"><div class="pot" aria-hidden="true">🍲</div><h1>Raiding everyone's fridges…</h1><p class="sub">Picking some dishes for you lot to vote on.</p></div>`);
+    if (state.status === 'voting') return show(votingView());
+    if (state.status === 'done' && state.result) return show(resultView());
+    return show(lobbyView());
+  }
+
+  function joinView() {
+    return `
+      <p class="kicker">Group ${esc(code)}</p>
+      <h1>What are we having?</h1>
+      <p class="sub">Your mates can't decide what to cook. Chuck in what's in your fridge, vote, and I'll sort it. No app needed.</p>
+      <div class="card" style="margin-top:auto">
+        <label for="name"><b>Your name</b></label>
+        <input id="name" type="text" maxlength="20" placeholder="e.g. Jo" autocomplete="given-name">
+        <p class="err" id="err" hidden></p>
+        <button class="btn" id="join">Join the group</button>
+        <p class="small-print">By joining you're 16 or over and agree to the <a href="/terms.html">Terms</a> and <a href="/privacy.html">Privacy Policy</a>. Recipes are made by AI: always check for allergies and that food is cooked through.</p>
+      </div>`;
+  }
+
+  function lobbyView() {
+    const me = state.me;
+    const members = state.members.map((m) => `<div class="member"><b>${esc(m.name)}${m.isHost ? ' 👑' : ''}</b><span>${m.ready ? '✅ ' + (m.itemCount ? m.itemCount + ' things' : 'mood only') : '⏳ adding food'}</span></div>`).join('');
+    const mine = me.ready && !draft.editing
+      ? `<div class="card"><h2>You're in ✅</h2><p class="hint" style="text-align:left">${esc(me.ingredients.join(', ') || 'No food, just vibes.')}${me.mood ? ' · ' + esc(MOODS.find((x) => x[0] === me.mood)?.[1]) : ''}</p><button class="btn outline" id="edit">Change it</button></div>`
+      : inputView(me);
+    return `
+      <p class="kicker">Group ${esc(state.code)}</p>
+      <h1>You're in, ${esc(me.name)}</h1>
+      <div class="card"><h2>Who's in (${state.members.length}/${state.maxMembers})</h2>${members}</div>
+      ${mine}
+      <p class="hint">${me.ready ? 'Waiting for ' + esc(state.members.find((m) => m.isHost)?.name || 'the host') + ' to start the vote.' : 'Add what you’ve got, then tap I’m in.'}</p>`;
+  }
+
+  function inputView(me) {
+    const chips = draft.items.map((it, i) => `<button class="chip" data-remove="${i}" aria-label="Remove ${esc(it)}">${esc(it)} ✕</button>`).join('');
+    const moods = MOODS.map(([v, l]) => `<button class="mood" data-mood="${v}" aria-pressed="${draft.mood === v}">${l}</button>`).join('');
+    return `
+      <div class="card">
+        <h2>What have you got?</h2>
+        ${draft.spotting ? '<p class="hint">Having a nosey in your fridge…</p>' : me.photosLeft > 0 ? '<button class="btn outline" id="snap">📷 Snap my fridge</button><input type="file" id="photo" accept="image/*" capture="environment" hidden>' : ''}
+        <div class="row"><input id="typed" class="small" type="text" placeholder="Or type it: chicken, peppers…" aria-label="Add food"><button class="plus" id="add" aria-label="Add">+</button></div>
+        ${chips ? `<div class="chips">${chips}</div>` : ''}
+        <h2>What are you in the mood for?</h2>
+        <div class="chips">${moods}</div>
+        <input id="dislikes" class="small" type="text" maxlength="120" placeholder="Anything you don't eat? (optional)" aria-label="Anything you don't eat" value="${esc(draft.dislikes)}">
+        <button class="btn" id="ready" ${(!draft.items.length && !draft.mood) || busy || draft.spotting ? 'disabled' : ''}>I'm in</button>
+      </div>`;
+  }
+
+  function votingView() {
+    const me = state.me;
+    const open = state.dishes.map((d, i) => ({ d, i })).filter(({ d }) => !d.vetoed);
+    const next = open.find(({ i }) => !me.votes[i] && me.vetoIndex !== i);
+    if (!next) {
+      const rows = state.members.map((m) => `<div class="member"><b>${esc(m.name)}</b><span>${m.votesDone ? '✅ done' : '🤔 still swiping'}</span></div>`).join('');
+      return `<p class="kicker">Group ${esc(state.code)}</p><h1>Votes in. Waiting on the others…</h1><div class="card">${rows}</div>`;
+    }
+    const pos = open.findIndex(({ i }) => i === next.i) + 1;
+    return `
+      <p class="kicker">Dish ${pos} of ${open.length} · swipe right for yes, left for nah</p>
+      <div class="dish" id="dish" data-index="${next.i}">
+        <span class="stamp yes" id="sy">YES</span><span class="stamp no" id="sn">NAH</span>
+        <h2>${esc(next.d.title)}</h2>
+        <p class="blurb">${esc(next.d.blurb)}</p>
+        <p class="meta">⏱ about ${Number(next.d.minutes) || 30} min</p>
+        ${next.d.uses?.length ? `<p class="meta">Uses: ${esc(next.d.uses.join(', '))}</p>` : ''}
+      </div>
+      <div class="votes"><button class="btn outline" data-vote="no" ${busy ? 'disabled' : ''}>👎 Nah</button><button class="btn" data-vote="yes" ${busy ? 'disabled' : ''}>👍 Yes</button></div>
+      ${me.vetoIndex === null ? `<button class="btn dark" data-vote="veto" ${busy ? 'disabled' : ''}>🙅 Absolutely not (1 left)</button>` : '<p class="hint">You’ve used your Absolutely not.</p>'}`;
+  }
+
+  function resultView() {
+    const r = state.result;
+    const jobs = r.jobs.map((j) => `<div class="member"><b>${esc(j.name)}</b><span>${esc(j.job)}</span></div>`).join('');
+    return `
+      <p class="kicker">${r.tie ? 'Not Fussed has spoken' : 'The votes are in'}</p>
+      <h1>${esc(r.line)}</h1>
+      <div class="dish" style="min-height:0"><h2>${esc(r.title)}</h2><p class="blurb">${esc(r.blurb)}</p><p class="meta">⏱ about ${Number(r.minutes) || 30} min · 👍 ${r.yes} of ${state.members.length}</p></div>
+      <div class="card"><h2>Jobs</h2>${jobs}</div>
+      <button class="btn outline" id="share">📲 Send it to the group</button>
+      <div class="cta"><b>Can't decide what to cook on your own nights either?</b><p>Snap your fridge and Not Fussed picks one meal. <a href="/">Get the app</a></p></div>
+      <p class="small-print">Recipes are made by AI. Always check for allergies and that food is cooked through.</p>`;
+  }
+
+  // Hook up buttons after each redraw.
+  function wire() {
+    const $ = (id) => document.getElementById(id);
+    $('join')?.addEventListener('click', async () => {
+      const name = $('name').value.trim();
+      if (!name) return;
+      $('join').disabled = true;
+      try {
+        const res = await call('join', { name });
+        token = res.token;
+        store.set('nf-group-' + code, token);
+        await refresh();
+      } catch (e) {
+        $('err').textContent = e.message; $('err').hidden = false; $('join').disabled = false;
+      }
+    });
+    $('name')?.addEventListener('keydown', (e) => { if (e.key === 'Enter') $('join').click(); });
+    $('edit')?.addEventListener('click', () => {
+      draft = { items: [...state.me.ingredients], mood: state.me.mood, dislikes: draft.dislikes, editing: true };
+      render();
+    });
+    const addTyped = () => {
+      const extra = $('typed').value.split(',').map((t) => t.trim()).filter(Boolean);
+      draft.items = [...new Set([...draft.items, ...extra])].slice(0, 40);
+      $('typed').value = '';
+      render();
+      $('typed')?.focus();
+    };
+    $('add')?.addEventListener('click', addTyped);
+    $('typed')?.addEventListener('keydown', (e) => { if (e.key === 'Enter') addTyped(); });
+    $('dislikes')?.addEventListener('input', (e) => { draft.dislikes = e.target.value; });
+    for (const b of document.querySelectorAll('[data-remove]')) b.addEventListener('click', () => { draft.items.splice(Number(b.dataset.remove), 1); render(); });
+    for (const b of document.querySelectorAll('[data-mood]')) b.addEventListener('click', () => { draft.mood = draft.mood === b.dataset.mood ? null : b.dataset.mood; render(); });
+    $('snap')?.addEventListener('click', () => $('photo').click());
+    $('photo')?.addEventListener('change', async (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      draft.spotting = true; render();
+      try {
+        const image = await shrink(file);
+        const res = await call('spot', { image });
+        const found = (res.ingredients || []).map((n) => String(n).replace(/\?$/, '').trim()).filter(Boolean);
+        draft.items = [...new Set([...draft.items, ...found])].slice(0, 40);
+      } catch (err) { alert(err.message); }
+      finally { draft.spotting = false; await refresh(); render(); }
+    });
+    $('ready')?.addEventListener('click', () => act(async () => {
+      await call('ready', { ingredients: draft.items, mood: draft.mood, dislikes: draft.dislikes });
+      draft.editing = false;
+    }));
+    for (const b of document.querySelectorAll('[data-vote]')) {
+      b.addEventListener('click', () => {
+        const index = Number($('dish').dataset.index);
+        const vote = b.dataset.vote;
+        if (vote === 'veto' && !confirm('Absolutely not? You only get one, and it goes for everyone.')) return;
+        act(() => call('vote', { index, vote }));
+      });
+    }
+    const dish = $('dish');
+    if (dish && dish.dataset.index !== undefined && state?.status === 'voting') swipe(dish);
+    $('share')?.addEventListener('click', async () => {
+      const r = state.result;
+      const text = `${r.line}\n\n🍳 ${r.title}\n${r.blurb}\n\nJobs:\n${r.jobs.map((j) => j.name + ': ' + j.job).join('\n')}\n\nSorted by Not Fussed: https://getnotfussed.com`;
+      try {
+        if (navigator.share) await navigator.share({ text });
+        else { await navigator.clipboard.writeText(text); alert('Copied. Paste it in the group chat.'); }
+      } catch {}
+    });
+  }
+
+  // Drag the dish card left (nah) or right (yes).
+  function swipe(card) {
+    let startX = null, dx = 0;
+    card.addEventListener('pointerdown', (e) => { startX = e.clientX; dx = 0; card.style.transition = 'none'; card.setPointerCapture(e.pointerId); });
+    card.addEventListener('pointermove', (e) => {
+      if (startX === null) return;
+      dx = e.clientX - startX;
+      card.style.transform = `translateX(${dx}px) rotate(${dx / 25}deg)`;
+      document.getElementById('sy').style.opacity = Math.max(0, Math.min(1, dx / 110));
+      document.getElementById('sn').style.opacity = Math.max(0, Math.min(1, -dx / 110));
+    });
+    const end = () => {
+      if (startX === null) return;
+      startX = null;
+      card.style.transition = '';
+      if (Math.abs(dx) > 110 && !busy) {
+        card.style.transform = `translateX(${dx > 0 ? 600 : -600}px)`;
+        const index = Number(card.dataset.index);
+        setTimeout(() => act(() => call('vote', { index, vote: dx > 0 ? 'yes' : 'no' })), 160);
+      } else {
+        card.style.transform = '';
+        document.getElementById('sy').style.opacity = 0;
+        document.getElementById('sn').style.opacity = 0;
+      }
+    };
+    card.addEventListener('pointerup', end);
+    card.addEventListener('pointercancel', end);
+  }
+
+  // Make the photo small before sending (faster, cheaper): max 1280px, JPEG.
+  function shrink(file) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        const scale = Math.min(1, 1280 / Math.max(img.width, img.height));
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.round(img.width * scale);
+        canvas.height = Math.round(img.height * scale);
+        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+        URL.revokeObjectURL(img.src);
+        resolve(canvas.toDataURL('image/jpeg', 0.6).split(',')[1]);
+      };
+      img.onerror = () => reject(new Error("Couldn't read that photo. Try another."));
+      img.src = URL.createObjectURL(file);
+    });
+  }
+
+  render();
+  refresh();
+  setInterval(() => { if (!document.hidden && token && state?.status !== 'done') refresh(); }, POLL_MS);
+})();
+</script>
+</body>
+</html>
